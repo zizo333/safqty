@@ -9,3 +9,4 @@ enum AuthAction {
   login,
 }
 
+bool isPasswordChanged = false;

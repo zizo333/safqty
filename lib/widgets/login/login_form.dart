@@ -29,7 +29,7 @@ class _LoginFormState extends State<LoginForm> {
   Map<String, String> _loginData = {
     'mobile': '',
     'password': '',
-    'device_token': 'device token',
+    'device_token': '11111',
     'device_type': Platform.isAndroid ? 'android' : 'ios',
   };
 

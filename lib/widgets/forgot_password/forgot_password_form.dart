@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:safqty/constents/colors.dart';
+import 'package:safqty/constents/helper.dart';
 import 'package:safqty/providers/login_provider.dart';
 import 'package:safqty/screens/auth/login_screen.dart';
 import 'package:safqty/widgets/common/commons.dart';
@@ -171,6 +172,7 @@ class _ForgotPasswordFormState extends State<ForgotPasswordForm> {
         _loading = false;
       });
       if (result['value']) {
+        isPasswordChanged = true;
         Navigator.of(context).pop();
       } else {
         Commons.showAlert(

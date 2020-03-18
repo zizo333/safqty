@@ -1,11 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:safqty/constents/helper.dart';
+import 'package:safqty/models/custom_notification.dart';
 import 'package:safqty/screens/auth/register_screen.dart';
 import 'package:safqty/widgets/common/commons.dart';
 import 'package:safqty/widgets/login/login_form.dart';
 import 'package:safqty/widgets/login_register/login_register_style.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = '/login-screen';
@@ -15,10 +20,21 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+
+  CustomNotification notification = CustomNotification();
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+//    if (isPasswordChanged) {
+//      showToast('تم', context: context, duration: Duration(seconds: 2));
+//      isPasswordChanged = false;
+//    }
+  }
+
   @override
   Widget build(BuildContext context) {
-//    final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
-//    firebaseMessaging.getToken().then((value) => print(value));
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     return WillPopScope(
       onWillPop: () => Commons.closeTheApp(context),

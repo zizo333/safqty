@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:safqty/constents/colors.dart';
 import 'package:safqty/constents/helper.dart';
 import 'package:safqty/constents/keywords.dart';
+import 'package:safqty/models/custom_notification.dart';
 import 'package:safqty/providers/login_provider.dart';
 import 'package:safqty/providers/register_provider.dart';
 import 'package:safqty/screens/auth/forgot_password_screen.dart';
@@ -34,6 +35,15 @@ class _ActivationScreenState extends State<ActivationScreen> {
   var _count = 14;
   ActivationType activationType;
   var _loading = false;
+  final CustomNotification _customNotification = CustomNotification();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _customNotification.notificationConfig();
+    _customNotification.showNotification(widget.code);
+  }
 
   @override
   void dispose() async {
@@ -198,20 +208,6 @@ class _ActivationScreenState extends State<ActivationScreen> {
   // TODO: Helper functions
   Future<void> _checkField(TextEditingController controller) async {
     if (controller.text.trim().isEmpty) {
-      if (!_initActivation) {
-        showToast(
-          widget.code,
-          context: context,
-          textStyle: TextStyle(fontSize: 20.0, color: Colors.white),
-          backgroundColor: SOrange,
-          textPadding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 30.0),
-          borderRadius: BorderRadius.vertical(
-            top: Radius.elliptical(10.0, 20.0),
-            bottom: Radius.elliptical(10.0, 20.0),
-          ),
-          textAlign: TextAlign.justify,
-        );
-      }
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(

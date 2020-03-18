@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:safqty/constents/colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
@@ -201,6 +202,21 @@ class _NotesState extends State<Notes> with SingleTickerProviderStateMixin {
     showCupertinoModalPopup(
       context: context,
       builder: (context) => action,
+    );
+  }
+
+  void showCustomToast() {
+    showToast(
+      "title",
+      context: context,
+      textStyle: TextStyle(fontSize: 20.0, color: Colors.white),
+      backgroundColor: SOrange,
+      textPadding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 30.0),
+      borderRadius: BorderRadius.vertical(
+        top: Radius.elliptical(10.0, 20.0),
+        bottom: Radius.elliptical(10.0, 20.0),
+      ),
+      textAlign: TextAlign.justify,
     );
   }
 
