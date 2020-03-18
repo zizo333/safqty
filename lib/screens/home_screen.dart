@@ -1,9 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:safqty/constents/colors.dart';
 import 'package:safqty/screens/auction_details_screen.dart';
 import 'package:safqty/screens/filter_screen.dart';
-import 'package:safqty/screens/tabs/profile_screen.dart';
 import 'package:safqty/widgets/home/auction_footer.dart';
 import 'package:safqty/widgets/home/auction_horizontal_list.dart';
 import 'package:safqty/widgets/home/home_footer.dart';

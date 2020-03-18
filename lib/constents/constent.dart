@@ -5,5 +5,6 @@ const ACTIVATE_URL = BASE_URL + 'check_code';
 const CATEGORIES_URL = BASE_URL + 'categories';
 const INTERESTS_URL = BASE_URL + 'interests';
 const LOGIN_URL = BASE_URL + 'login';
+const LOGOUT_URL = BASE_URL + 'logout';
 const FORGET_PASSWORD_URL = BASE_URL + 'forget_password';
 const CHANGE_PASSWORD_URL = BASE_URL + 'change_password';

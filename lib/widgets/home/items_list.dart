@@ -1,12 +1,18 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:loading_indicator/loading_indicator.dart';
+import 'package:provider/provider.dart';
 import 'package:safqty/constents/colors.dart';
+import 'package:safqty/providers/login_provider.dart';
+import 'package:safqty/screens/auth/login_screen.dart';
 import 'package:safqty/screens/side_menu/bank_accounts_screen.dart';
 import 'package:safqty/screens/side_menu/commission_screen.dart';
 import 'package:safqty/screens/side_menu/orders_screen.dart';
 import 'package:safqty/screens/side_menu/sign_out_screen.dart';
 import 'package:safqty/screens/side_menu/support_screen.dart';
 import 'package:safqty/screens/side_menu/terms_screen.dart';
+import 'package:safqty/widgets/common/commons.dart';
 
 class ItemsList extends StatefulWidget {
   final Function exitCollapsing;
@@ -142,16 +148,114 @@ class _ItemsListState extends State<ItemsList> {
             });
             break;
           case 6:
-            Navigator.of(context)
-                .pushNamed(SignOutScreen.routeName)
-                .then((value) {
-              setState(() {
-                _index = 0;
-              });
-            });
+            _logout();
             break;
         }
       },
+    );
+  }
+
+  void _logout() {
+    var _loading = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text('هل أنت متأكد؟'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              SizedBox(
+                height: 40,
+                child: Row(
+                  children: <Widget>[
+                    Text('هل تريد تسجيل الخروج؟'),
+                    SizedBox(
+                      width: 15,
+                    ),
+                    _loading
+                        ? Container(
+                            height: 30,
+                            width: 30,
+                            child: LoadingIndicator(
+                              color: SOrange,
+                              indicatorType: Indicator.ballClipRotate,
+                            ),
+                          )
+                        : Container(),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Divider(),
+              Container(
+                height: 40,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Expanded(
+                      child: FlatButton(
+                        textColor: SOrange,
+                        child: Text('نعم'),
+                        onPressed: () async {
+                          setState(() {
+                            _loading = true;
+                          });
+                          try {
+                            await Provider.of<LoginProvider>(context,
+                                    listen: false)
+                                .logout();
+                            Navigator.of(context)
+                                .pushReplacementNamed(LoginScreen.routeName);
+                          } catch (error) {
+                            setState(() {
+                              _loading = false;
+                            });
+                            Navigator.of(ctx).pop();
+                            showToast(
+                              tr('check_internet'),
+                              context: ctx,
+                              backgroundColor: SOrange,
+                              position: StyledToastPosition.bottom,
+                              duration: Duration(seconds: 4),
+                              animDuration: Duration(seconds: 2),
+                              textPadding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 15),
+                              borderRadius: BorderRadius.circular(20),
+                              alignment: Alignment.center,
+                              textStyle: TextStyle(
+                                color: Colors.white,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                    Container(
+                      height: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      width: 1,
+                      color: Colors.black12,
+                    ),
+                    Expanded(
+                      child: FlatButton(
+                        textColor: SOrange,
+                        child: Text('لا'),
+                        onPressed: () => Navigator.of(context).pop(false),
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

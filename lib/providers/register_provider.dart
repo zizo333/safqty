@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:safqty/constents/constent.dart';
+import 'package:safqty/constents/helper.dart';
 
 class RegisterProvider with ChangeNotifier {
   var _mobile = '';
@@ -62,6 +63,7 @@ class RegisterProvider with ChangeNotifier {
       result['value'] = responseData['value'];
       if (responseData['value']) {
         _token = responseData['data']['token'];
+        saveUserToken(_token);
       } else {
         result['msg'] = responseData['msg'];
       }

@@ -60,6 +60,8 @@ class _SubmitInterestsButtonState extends State<SubmitInterestsButton> {
       if (result['value']) {
         final ref = await SharedPreferences.getInstance();
         await ref.setBool(IS_INTERESTS_SELECTED, true);
+        final deviceToken = await getDeviceToken();
+        await saveDeviceToken(deviceToken);
         Navigator.of(context).pushReplacementNamed(GoToHomeScreen.routeName);
       } else {
         Commons.showAlert(

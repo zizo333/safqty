@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +22,7 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   // TODO: Variables
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   var _textFieldStyle = TextStyle(fontSize: 20);
   GlobalKey<FormState> _form = GlobalKey();
   FocusNode _passwordNode = FocusNode();
@@ -29,7 +31,7 @@ class _LoginFormState extends State<LoginForm> {
   Map<String, String> _loginData = {
     'mobile': '',
     'password': '',
-    'device_token': '11111',
+    'device_token': '',
     'device_type': Platform.isAndroid ? 'android' : 'ios',
   };
 
@@ -178,6 +180,7 @@ class _LoginFormState extends State<LoginForm> {
       _loading = true;
     });
     try {
+      _loginData['device_token'] = await getDeviceToken();
       final result = await Provider.of<LoginProvider>(context, listen: false)
           .login(_loginData);
       setState(() {

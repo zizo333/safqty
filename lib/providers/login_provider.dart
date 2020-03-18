@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:safqty/constents/constent.dart';
+import 'package:safqty/constents/helper.dart';
 import 'package:safqty/models/login.dart';
 
 class LoginProvider with ChangeNotifier {
@@ -31,10 +33,12 @@ class LoginProvider with ChangeNotifier {
       result['value'] = responseData['value'];
       if (responseData['value']) {
         final loginData = Login.fromJson(responseData);
+        saveUserToken(loginData.data.token);
         result['verified'] = loginData.data.verified;
         result['code'] = loginData.data.code;
         result['mobile'] = loginData.data.mobile;
         _token = loginData.data.token;
+        await saveDeviceToken(_token);
       } else {
         result['msg'] = responseData['msg'];
       }
@@ -77,6 +81,22 @@ class LoginProvider with ChangeNotifier {
         result['msg'] = responseData['msg'];
       }
       return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  Future<void> logout() async {
+    try {
+      final deviceToken = await getDeviceToken();
+      final userToken = await getUserToken();
+      final response = await http.post(
+        LOGOUT_URL,
+        body: {'device_token': deviceToken},
+        headers: {HttpHeaders.authorizationHeader: 'Bearer $userToken'},
+      );
+      await removeDeviceToken();
+      await removeUserToken();
     } catch (error) {
       throw error;
     }

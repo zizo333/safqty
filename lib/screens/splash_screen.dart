@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:safqty/constents/helper.dart';
 import 'package:safqty/constents/keywords.dart';
 import 'package:safqty/screens/auth/intro_screen.dart';
 import 'package:safqty/screens/auth/login_screen.dart';
+import 'package:safqty/screens/tab_bar_items.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -14,15 +16,19 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   bool _state = false;
+  bool _firstLogin = true;
 
   @override
   void initState() {
     _checkIntroState();
+    _checkDeviceToken();
     super.initState();
     Timer(Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (ctx) => _state ? LoginScreen() : IntroScreen(),
+          builder: (ctx) => _state
+              ? _firstLogin ? LoginScreen() : TabBarItems()
+              : IntroScreen(),
         ),
       );
     });
@@ -30,9 +36,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIOverlays([]);
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      //resizeToAvoidBottomInset: false,
       body: Stack(
         children: <Widget>[
           Positioned(
@@ -74,5 +79,14 @@ class _SplashScreenState extends State<SplashScreen> {
       return;
     }
     _state = state;
+  }
+
+  Future<void> _checkDeviceToken() async {
+    final result = await checkDeviceToken();
+    if (result == null) {
+      _firstLogin = true;
+      return;
+    }
+    _firstLogin = false;
   }
 }

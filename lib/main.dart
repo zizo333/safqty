@@ -81,7 +81,7 @@ class MyApp extends StatelessWidget {
             Locale('ar', 'EG'),
             Locale('en', 'US'),
           ],
-          home: LoginScreen(),
+          home: SplashScreen(),
           routes: {
             LoginScreen.routeName: (ctx) => LoginScreen(),
             RegisterScreen.routeName: (ctx) => RegisterScreen(),
