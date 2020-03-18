@@ -1,0 +1,9 @@
+const BASE_URL = 'http://alkhalaffamily.com/safqty/public/api/';
+const CITY_URL = BASE_URL + 'cities';
+const REGISTER_URL = BASE_URL + 'register';
+const ACTIVATE_URL = BASE_URL + 'check_code';
+const CATEGORIES_URL = BASE_URL + 'categories';
+const INTERESTS_URL = BASE_URL + 'interests';
+const LOGIN_URL = BASE_URL + 'login';
+const FORGET_PASSWORD_URL = BASE_URL + 'forget_password';
+const CHANGE_PASSWORD_URL = BASE_URL + 'change_password';
