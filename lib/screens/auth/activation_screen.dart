@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
@@ -5,13 +7,11 @@ import 'package:loading_indicator/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:safqty/constents/colors.dart';
 import 'package:safqty/constents/helper.dart';
-import 'package:safqty/constents/keywords.dart';
 import 'package:safqty/models/custom_notification.dart';
 import 'package:safqty/providers/login_provider.dart';
 import 'package:safqty/providers/register_provider.dart';
 import 'package:safqty/screens/auth/forgot_password_screen.dart';
 import 'package:safqty/screens/auth/interests_screen.dart';
-import 'package:safqty/screens/tab_bar_items.dart';
 import 'package:safqty/widgets/activationCode/activation_code.dart';
 import 'package:safqty/widgets/activationCode/activation_mobile_number.dart';
 import 'package:safqty/widgets/common/commons.dart';
@@ -20,8 +20,13 @@ class ActivationScreen extends StatefulWidget {
   static const routeName = '/activation-screen';
   final String code;
   final String mobile;
+  final ActivationType activationType;
 
-  ActivationScreen({this.code = '', this.mobile = ''});
+  ActivationScreen({
+    this.code = '1111',
+    this.mobile = '',
+    this.activationType,
+  });
 
   @override
   _ActivationScreenState createState() => _ActivationScreenState();
@@ -32,8 +37,8 @@ class _ActivationScreenState extends State<ActivationScreen> {
   final _mobileNumberController = TextEditingController();
   final _codeController = TextEditingController();
   var _initActivation = true;
-  var _count = 14;
-  ActivationType activationType;
+  var _count = 0;
+  Timer _timer;
   var _loading = false;
   final CustomNotification _customNotification = CustomNotification();
 
@@ -41,8 +46,11 @@ class _ActivationScreenState extends State<ActivationScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _customNotification.notificationConfig();
-    _customNotification.showNotification(widget.code);
+    if (widget.activationType == ActivationType.register) {
+      _customNotification.notificationConfig();
+      _customNotification.showNotification(widget.code);
+      startTimer();
+    }
   }
 
   @override
@@ -50,14 +58,12 @@ class _ActivationScreenState extends State<ActivationScreen> {
     // TODO: implement dispose
     super.dispose();
     _mobileNumberController.dispose();
+    if(!_initActivation){_timer.cancel();}
   }
 
   @override
   Widget build(BuildContext context) {
-    activationType =
-        ModalRoute.of(context).settings.arguments as ActivationType ??
-            ActivationType.register;
-    if (activationType == ActivationType.register) {
+    if (widget.activationType == ActivationType.register) {
       _initActivation = false;
     }
     return Scaffold(
@@ -97,7 +103,10 @@ class _ActivationScreenState extends State<ActivationScreen> {
                   children: <Widget>[
                     Commons.safqtyHeader(),
                     _initActivation
-                        ? ActivationMobileNumber(_mobileNumberController)
+                        ? ActivationMobileNumber(
+                            _mobileNumberController,
+                            widget.activationType,
+                          )
                         : ActivationCode(_codeController, widget.code),
                     SizedBox(
                       height: 30,
@@ -160,7 +169,14 @@ class _ActivationScreenState extends State<ActivationScreen> {
                                         fontSize: 13,
                                       ),
                                     ),
-                                    onPressed: () {},
+                                    onPressed: _count >= 20
+                                        ? () {
+                                            _customNotification
+                                                .showNotification(widget.code);
+                                            _count = 0;
+                                            startTimer();
+                                          }
+                                        : null,
                                   ),
                                   SizedBox(
                                     width: 5,
@@ -230,7 +246,7 @@ class _ActivationScreenState extends State<ActivationScreen> {
       );
     } else {
       if (!_initActivation) {
-        switch (activationType) {
+        switch (widget.activationType) {
           case ActivationType.register:
             setState(() {
               _loading = true;
@@ -263,18 +279,11 @@ class _ActivationScreenState extends State<ActivationScreen> {
               });
             }
             break;
-//          case ActivationType.forgotPassword:
-//            Navigator.of(context)
-//                .pushReplacementNamed(ForgotPasswordScreen.routeName);
-//            break;
-          case ActivationType.mobileNumber:
-            Navigator.of(context).pop();
-            break;
         }
         setState(() {
           _initActivation = false;
         });
-      } else if (activationType == ActivationType.forgotPassword) {
+      } else if (widget.activationType == ActivationType.forgotPassword) {
         _checkMobileNumber(controller);
       }
     }
@@ -311,5 +320,18 @@ class _ActivationScreenState extends State<ActivationScreen> {
         _loading = false;
       });
     }
+  }
+
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = Timer.periodic(oneSec, (timer) {
+      setState(() {
+        if (_count < 20) {
+          _count++;
+        } else {
+          timer.cancel();
+        }
+      });
+    });
   }
 }

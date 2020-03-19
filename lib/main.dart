@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:safqty/constents/colors.dart';
 import 'package:safqty/providers/category_provider.dart';
 import 'package:safqty/providers/city_provider.dart';
+import 'package:safqty/providers/home_provider.dart';
 import 'package:safqty/providers/login_provider.dart';
 import 'package:safqty/providers/register_provider.dart';
 import 'package:safqty/screens/add_auction/add_auction_screen.dart';
@@ -62,6 +63,9 @@ class MyApp extends StatelessWidget {
           ),
           ChangeNotifierProvider.value(
             value: LoginProvider(),
+          ),
+          ChangeNotifierProvider.value(
+            value: HomeProvider(),
           )
         ],
         child: MaterialApp(

@@ -10,9 +10,14 @@ import 'package:safqty/models/login.dart';
 
 class LoginProvider with ChangeNotifier {
   String _token = '';
+  List<int> _categories = [];
 
   String get token {
     return _token;
+  }
+
+  List<int> get categories {
+    return _categories;
   }
 
   Future<Map<String, dynamic>> login(Map<String, dynamic> parameters) async {
@@ -21,7 +26,8 @@ class LoginProvider with ChangeNotifier {
       'msg': '',
       'verified': '',
       'code': '',
-      'mobile': ''
+      'mobile': '',
+      'categories': List<int>(),
     };
     try {
       final response = await http.post(
@@ -37,8 +43,16 @@ class LoginProvider with ChangeNotifier {
         result['verified'] = loginData.data.verified;
         result['code'] = loginData.data.code;
         result['mobile'] = loginData.data.mobile;
+        _categories = loginData.data.userCategories.map((e) => e.id).toList();
+        result['categories'] = _categories;
         _token = loginData.data.token;
         await saveDeviceToken(_token);
+        await saveUserData(
+          loginData.data.name,
+          loginData.data.email,
+          loginData.data.mobile,
+          loginData.data.image,
+        );
       } else {
         result['msg'] = responseData['msg'];
       }
@@ -97,6 +111,40 @@ class LoginProvider with ChangeNotifier {
       );
       await removeDeviceToken();
       await removeUserToken();
+      await removeUserData();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  Future<Map<String, dynamic>> updateProfile(Map<String, String> parameters) async {
+    Map<String, dynamic> result = {
+      'value': false,
+      'msg': '',
+    };
+    try {
+      final deviceToken = await getDeviceToken();
+      final token = await getUserToken();
+      parameters['device_type'] = Platform.isAndroid ? 'android' : 'ios';
+      parameters['device_token'] = deviceToken;
+      final response = await http.post(
+        UPDATE_PROFILE_URL,
+        body: parameters,
+        headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
+      );
+      final responseData = json.decode(response.body);
+      result['value'] = responseData['value'];
+      if(!result['value']) {
+        result['msg'] = responseData['msg'];
+      } else {
+        await saveUserData(
+          responseData['name'],
+          responseData['email'],
+          responseData['mobile'],
+          responseData['image'],
+        );
+      }
+      return result;
     } catch (error) {
       throw error;
     }

@@ -126,5 +126,9 @@
   "see_your_auction": "You can see your auction now if you want",
   "watch_auction" : "Watch the auction",
   "change_password" : "Change password",
-  "enter_your_mobile_number_to_change_the_password" : "Enter your mobile number to change the password"
+  "change_mobile" : "Change mobile number",
+  "enter_your_mobile_number_to_change_the_mobile_number" : "Enter your mobile number to change the mobile number",
+  "enter_your_mobile_number_to_change_the_password" : "Enter your mobile number to change the password",
+  "update" : "Update",
+  "updated_data" : "Updated successfully"
 }

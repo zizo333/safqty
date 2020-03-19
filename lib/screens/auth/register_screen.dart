@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:safqty/constents/colors.dart';
+import 'package:safqty/constents/helper.dart';
 import 'package:safqty/models/register.dart';
 import 'package:safqty/providers/register_provider.dart';
 import 'package:safqty/screens/auth/activation_screen.dart';
@@ -38,7 +39,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           children: <Widget>[
             ListView(
               padding: const EdgeInsets.only(
-                  top: 100, left: 20, right: 20, bottom: 30),
+                top: 100,
+                left: 20,
+                right: 20,
+                bottom: 30,
+              ),
               children: <Widget>[
                 ChooseImage(_getPickedImage),
                 SizedBox(
@@ -76,12 +81,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: Text(
                         tr('terms_conditions'),
                         style: TextStyle(
-                            fontSize: 14,
-                            color: SOrange,
-                            decoration: TextDecoration.underline),
+                          fontSize: 14,
+                          color: SOrange,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
-                      onTap: () =>
-                          Navigator.of(context).pushNamed(TermsScreen.routeName),
+                      onTap: () => Navigator.of(context)
+                          .pushNamed(TermsScreen.routeName),
                     ),
                   ],
                 ),
@@ -171,6 +177,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             builder: (ctx) => ActivationScreen(
               code: result['msg'],
               mobile: result['mobile'],
+              activationType: ActivationType.register,
             ),
           ),
         );

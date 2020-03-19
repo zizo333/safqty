@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:safqty/constents/colors.dart';
+import 'package:safqty/constents/helper.dart';
 import 'package:safqty/widgets/auction_common/auction_grid_items.dart';
 import 'package:safqty/widgets/profile/auction_numbers.dart';
 import 'package:safqty/widgets/profile/profile_settings.dart';
@@ -15,6 +16,22 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   // TODO: Variables
   var _showSettings = false;
+  Map<String, String> _userData = {
+    'name' : tr('name'),
+    'mobile' : tr('phone_number'),
+    'email' : tr('email'),
+  };
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserData().then((value) {
+      setState(() {
+        _userData = value;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Align(
             alignment: Alignment.center,
             child: Text(
-              'أسامة محمد العيتيبي',
+              _userData['name'],
               style: TextStyle(
                 fontSize: 25,
                 color: Color(0XFF434A51),
@@ -152,7 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _showSettings
-                ? ProfileSettings()
+                ? ProfileSettings(_userData)
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[

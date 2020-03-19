@@ -20,11 +20,7 @@ class RegisterProvider with ChangeNotifier {
     Map<String, String> parameters,
     File userImage,
   ) async {
-    Map<String, dynamic> result = {
-      'value': '',
-      'msg': '',
-      'mobile' : ''
-    };
+    Map<String, dynamic> result = {'value': '', 'msg': '', 'mobile': ''};
     try {
       final response = await http.post(
         REGISTER_URL,
@@ -39,6 +35,12 @@ class RegisterProvider with ChangeNotifier {
         result['msg'] = '${responseData['data']['code']}';
         result['mobile'] = parameters['mobile'];
         _token = responseData['data']['token'].toString();
+        await saveUserData(
+          responseData['data']['name'],
+          responseData['data']['email'],
+          responseData['data']['mobile'],
+          responseData['data']['image'],
+        );
         return result;
       } else {
         result['msg'] = responseData['msg'];
@@ -49,7 +51,8 @@ class RegisterProvider with ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> verifyAccount({String code, String mobile}) async {
+  Future<Map<String, dynamic>> verifyAccount(
+      {String code, String mobile}) async {
     Map<String, dynamic> result = {
       'value': '',
       'msg': '',

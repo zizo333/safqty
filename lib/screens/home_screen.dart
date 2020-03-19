@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:safqty/constents/helper.dart';
 import 'package:safqty/screens/auction_details_screen.dart';
 import 'package:safqty/screens/filter_screen.dart';
 import 'package:safqty/widgets/home/auction_footer.dart';
@@ -12,10 +13,6 @@ import 'package:safqty/widgets/home/profile.dart';
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home-screen';
 
-//  final Function checkCollapsing;
-//
-//  HomeScreen([this.checkCollapsing]);
-
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -23,6 +20,18 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // TODO: Variables
   var _isCollapsed = false;
+  Map<String, String> _userData = {};
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserData().then((value) {
+      setState(() {
+        _userData = value;
+      });
+    });
+  }
 
   @override
   void dispose() {
@@ -59,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ListView(
                 padding: const EdgeInsets.only(top: 75, bottom: 20),
                 children: <Widget>[
-                  Profile(),
+                  Profile(_userData['name'] ?? tr('name')),
                   SizedBox(
                     height: isLandscape ? 5 : 20,
                   ),
@@ -274,6 +283,5 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _isCollapsed = !_isCollapsed;
     });
-//    widget.checkCollapsing(_isCollapsed);
   }
 }

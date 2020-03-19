@@ -223,7 +223,7 @@ class _ItemsListState extends State<ItemsList> {
                               backgroundColor: SOrange,
                               position: StyledToastPosition.bottom,
                               duration: Duration(seconds: 4),
-                              animDuration: Duration(seconds: 2),
+                              animDuration: Duration(milliseconds: 200),
                               textPadding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 15),
                               borderRadius: BorderRadius.circular(20),

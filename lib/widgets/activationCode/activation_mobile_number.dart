@@ -1,11 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:safqty/constents/colors.dart';
+import 'package:safqty/constents/helper.dart';
 
 class ActivationMobileNumber extends StatefulWidget {
   final TextEditingController textEditingController;
+  final ActivationType activationType;
 
-  ActivationMobileNumber(this.textEditingController);
+  ActivationMobileNumber(this.textEditingController,
+      [this.activationType = ActivationType.forgotPassword]);
 
   @override
   _ActivationMobileNumberState createState() => _ActivationMobileNumberState();
@@ -17,7 +20,9 @@ class _ActivationMobileNumberState extends State<ActivationMobileNumber> {
     return Column(
       children: <Widget>[
         Text(
-          tr('change_password'),
+          widget.activationType == ActivationType.forgotPassword
+              ? tr('change_password')
+              : tr('change_mobile'),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -27,14 +32,16 @@ class _ActivationMobileNumberState extends State<ActivationMobileNumber> {
         SizedBox(
           height: 20,
         ),
-        Text(
-          tr('enter_your_mobile_number_to_change_the_password'),
-          style: TextStyle(
-            fontSize: 18,
-            color: Color(0XFF606060),
-          ),
-          textAlign: TextAlign.center,
-        ),
+        widget.activationType == ActivationType.forgotPassword
+            ? Text(
+                tr('enter_your_mobile_number_to_change_the_password'),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Color(0XFF606060),
+                ),
+                textAlign: TextAlign.center,
+              )
+            : Container(),
         SizedBox(
           height: 30,
         ),

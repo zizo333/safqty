@@ -1,3 +1,5 @@
+import 'package:safqty/models/category.dart';
+
 class Login {
   final bool value;
   final LoginData data;
@@ -28,6 +30,7 @@ class LoginData {
   final String code;
   final String verified;
   final int cityId;
+  final List<CategoryData> userCategories;
   final String token;
 
   LoginData({
@@ -40,6 +43,7 @@ class LoginData {
     this.code,
     this.verified,
     this.cityId,
+    this.userCategories,
     this.token,
   });
 
@@ -54,6 +58,9 @@ class LoginData {
       code: json['code'].toString(),
       verified: json['verified'],
       cityId: json['city_id'],
+      userCategories: (json['user_categories'] as List)
+          .map((e) => CategoryData.fromJson(e))
+          .toList(),
       token: json['token'],
     );
   }

@@ -58,8 +58,6 @@ class _SubmitInterestsButtonState extends State<SubmitInterestsButton> {
       final result = await Provider.of<CategoryProvider>(context, listen: false)
           .addInterestedCategories(widget.selectedCategories, token);
       if (result['value']) {
-        final ref = await SharedPreferences.getInstance();
-        await ref.setBool(IS_INTERESTS_SELECTED, true);
         final deviceToken = await getDeviceToken();
         await saveDeviceToken(deviceToken);
         Navigator.of(context).pushReplacementNamed(GoToHomeScreen.routeName);

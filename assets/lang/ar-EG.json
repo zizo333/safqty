@@ -126,5 +126,9 @@
   "see_your_auction" : "يمكنك مشاهدة مزادك الان ان كنت تريد",
   "watch_auction" : "مشاهدة المزاد",
   "change_password" : "تغيير كلمة المرور",
-  "enter_your_mobile_number_to_change_the_password" : "أدخل رقم جوالك لتغيير كلمة المرور"
+  "change_mobile" : "تغيير رقم الجوال",
+  "enter_your_mobile_number_to_change_the_mobile_number" : "أدخل رقم جوالك لتغيير رقم الجوال",
+  "enter_your_mobile_number_to_change_the_password" : "أدخل رقم جوالك لتغيير كلمة المرور",
+  "update" : "تعديل",
+  "updated_data" : "تم تعديل البيانات الشخصية"
 }

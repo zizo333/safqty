@@ -134,9 +134,12 @@ class _LoginFormState extends State<LoginForm> {
                       color: Color(0XFF606060),
                     ),
                   ),
-                  onTap: () => Navigator.of(context).pushNamed(
-                    ActivationScreen.routeName,
-                    arguments: ActivationType.forgotPassword,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (ctx) => ActivationScreen(
+                        activationType: ActivationType.forgotPassword,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -187,10 +190,8 @@ class _LoginFormState extends State<LoginForm> {
         _loading = false;
       });
       if (result['value']) {
-        final pref = await SharedPreferences.getInstance();
-        final checkInterests = pref.getBool(IS_INTERESTS_SELECTED) ?? false;
         if (result['verified'].toString().contains('true')) {
-          checkInterests
+          (result['categories'] as List).isNotEmpty
               ? Navigator.of(context)
                   .pushReplacementNamed(TabBarItems.routeName)
               : Navigator.of(context).pushNamed(InterestsScreen.routeName);
@@ -200,6 +201,7 @@ class _LoginFormState extends State<LoginForm> {
               builder: (ctx) => ActivationScreen(
                 code: result['code'],
                 mobile: result['mobile'],
+                activationType: ActivationType.register,
               ),
             ),
           );

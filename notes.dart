@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:safqty/constents/colors.dart';
@@ -50,6 +51,8 @@ class Notes extends StatefulWidget {
 
 class _NotesState extends State<Notes> with SingleTickerProviderStateMixin {
   Size deviceSize;
+  var _count = 0;
+  Timer _timer;
 
   // TODO: animation
   AnimationController animationController;
@@ -314,6 +317,59 @@ class _NotesState extends State<Notes> with SingleTickerProviderStateMixin {
       child: Padding(
           padding: const EdgeInsets.only(bottom: 8), child: ListTile() // ...
           ),
+    );
+  }
+
+  /// timer
+  void startTimer() {  // in dispose -> _timer.cancel()
+    const oneSec = const Duration(seconds: 1);
+    _timer = Timer.periodic(oneSec, (timer) {
+      setState(() {
+        if (_count < 20) {
+          _count++;
+        } else {
+          timer.cancel();
+        }
+      });
+    });
+  }
+}
+
+// local notification
+class MyNotification {
+  FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
+
+  Future notificationConfig() async {
+    _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    var androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    var iosSettings = IOSInitializationSettings();
+    var initSettings = InitializationSettings(androidSettings, iosSettings);
+    await _flutterLocalNotificationsPlugin.initialize(initSettings,
+        onSelectNotification: _onSelectNotification);
+  }
+
+  Future _onSelectNotification(String payload) async {
+    if (payload != null) {
+      debugPrint('notification payload: ' + payload);
+    }
+  }
+
+  Future showNotification(String code) async {
+    var android = AndroidNotificationDetails(
+      "channelId",
+      "channelName",
+      "channelDescription",
+      priority: Priority.High,
+      importance: Importance.Max,
+    );
+    var ios = IOSNotificationDetails();
+    var platform = NotificationDetails(android, ios);
+    await _flutterLocalNotificationsPlugin.show(
+      0,
+      "Verification code",
+      code,
+      platform,
+      payload: code,
     );
   }
 }

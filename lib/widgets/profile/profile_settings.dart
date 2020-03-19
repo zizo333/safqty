@@ -1,11 +1,20 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:loading_indicator/loading_indicator.dart';
+import 'package:provider/provider.dart';
 import 'package:safqty/constents/colors.dart';
 import 'package:safqty/constents/helper.dart';
+import 'package:safqty/providers/login_provider.dart';
 import 'package:safqty/screens/auth/activation_screen.dart';
+import 'package:safqty/widgets/common/commons.dart';
 import 'package:safqty/widgets/login_register/login_register_style.dart';
 
 class ProfileSettings extends StatefulWidget {
+  final Map<String, String> userData;
+
+  ProfileSettings(this.userData);
+
   @override
   _ProfileSettingsState createState() => _ProfileSettingsState();
 }
@@ -13,16 +22,33 @@ class ProfileSettings extends StatefulWidget {
 class _ProfileSettingsState extends State<ProfileSettings> {
   // TODO: Variables
   var _personalData = false;
-  var _mobileNumber = false;
+  var _changePassword = false;
+  var _update = false;
+  var _loading = false;
   GlobalKey<FormState> _form = GlobalKey();
-  Map _changedData = {
-    'name' : '',
-    'phone' : '',
-    'email' : ''
+  Map<String, String> _changedData = {
+    'name': '',
+    'mobile': '',
+    'email': '',
+    'device_token': '',
+    'device_type': '',
+    'image': '',
   };
+  FocusNode _phoneNumberNode = FocusNode();
+  FocusNode _emailNode = FocusNode();
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _phoneNumberNode.dispose();
+    _emailNode.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    var isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    var isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
     if (_personalData) {
       return _showPersonalDataScreen(isLandscape);
     } else {
@@ -40,7 +66,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           SizedBox(
             height: 10,
           ),
-          _buildSettingChoice(tr('modify_number'), 1),
+          _buildSettingChoice(tr('change_password'), 1),
         ],
       ),
     );
@@ -59,9 +85,15 @@ class _ProfileSettingsState extends State<ProfileSettings> {
               height: 10,
             ),
             TextFormField(
+              enabled: _update ? true : false,
               style: TextStyle(color: SBlack),
-              initialValue: 'عبدالعزيز عادل الخولى',
+              initialValue: widget.userData['name'],
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.text,
               cursorColor: SOrange,
+              onFieldSubmitted: (value) {
+                FocusScope.of(context).requestFocus(_phoneNumberNode);
+              },
               decoration: LoginRegisterStyle.texFieldDecoration(''),
               validator: (value) {
                 if (value.trim().isEmpty) {
@@ -81,10 +113,17 @@ class _ProfileSettingsState extends State<ProfileSettings> {
               height: 10,
             ),
             TextFormField(
+              enabled: _update ? true : false,
               style: TextStyle(color: SBlack),
-              initialValue: '684329692754',
+              initialValue: widget.userData['mobile'],
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.phone,
               cursorColor: SOrange,
               decoration: LoginRegisterStyle.texFieldDecoration(''),
+              focusNode: _phoneNumberNode,
+              onFieldSubmitted: (value) {
+                FocusScope.of(context).requestFocus(_emailNode);
+              },
               validator: (value) {
                 if (value.trim().isEmpty) {
                   return tr('please_enter_the_phone_number');
@@ -92,7 +131,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                 return null;
               },
               onSaved: (value) {
-                _changedData['phone'] = value;
+                _changedData['mobile'] = value;
               },
             ),
             SizedBox(
@@ -103,10 +142,13 @@ class _ProfileSettingsState extends State<ProfileSettings> {
               height: 10,
             ),
             TextFormField(
+              enabled: _update ? true : false,
               style: TextStyle(color: SBlack),
-              initialValue: 'zizo@gmail.com',
+              initialValue: widget.userData['email'],
+              keyboardType: TextInputType.emailAddress,
               cursorColor: SOrange,
               decoration: LoginRegisterStyle.texFieldDecoration(''),
+              focusNode: _emailNode,
               validator: (value) {
                 if (value.trim().isEmpty) {
                   return tr('please_enter_the_email');
@@ -128,18 +170,35 @@ class _ProfileSettingsState extends State<ProfileSettings> {
               margin: const EdgeInsets.symmetric(horizontal: 40),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: RaisedButton(
-                  color: SOrange,
-                  child: Text(
-                    tr('confirm'),
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  onPressed: _submit,
-                ),
+                child: _loading
+                    ? Container(
+                        alignment: Alignment.center,
+                        width: 53,
+                        child: LoadingIndicator(
+                          color: SOrange,
+                          indicatorType: Indicator.ballClipRotate,
+                        ),
+                      )
+                    : RaisedButton(
+                        color: SOrange,
+                        child: Text(
+                          _update ? tr('confirm') : tr('update'),
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        onPressed: () {
+                          if (!_update) {
+                            setState(() {
+                              _update = true;
+                            });
+                          } else {
+                            _submit();
+                          }
+                        },
+                      ),
               ),
             ),
           ],
@@ -148,11 +207,51 @@ class _ProfileSettingsState extends State<ProfileSettings> {
     );
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_form.currentState.validate()) {
       return;
     }
     _form.currentState.save();
+    setState(() {
+      _loading = true;
+    });
+    try {
+      final result = await Provider.of<LoginProvider>(context, listen: false)
+          .updateProfile(_changedData);
+      setState(() {
+        _update = false;
+      });
+      if (!result['value']) {
+        Commons.showAlert(
+          context: context,
+          title: tr('warning'),
+          content: result['msg'],
+        );
+      } else {
+        showToast(
+          tr('updated_data'),
+          context: context,
+          textStyle: TextStyle(fontSize: 20.0, color: Colors.white),
+          backgroundColor: SOrange,
+          textPadding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 30.0),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.elliptical(10.0, 20.0),
+            bottom: Radius.elliptical(10.0, 20.0),
+          ),
+          textAlign: TextAlign.justify,
+        );
+      }
+    } catch (error) {
+      Commons.showAlert(
+        context: context,
+        title: tr('warning'),
+        content: tr('check_internet'),
+      );
+    } finally {
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   Widget _buildSettingChoice(String title, int index) {
@@ -195,12 +294,19 @@ class _ProfileSettingsState extends State<ProfileSettings> {
             break;
           case 1:
             setState(() {
-              _mobileNumber = !_mobileNumber;
-              if (_mobileNumber) {
-                Navigator.of(context).pushNamed(
-                  ActivationScreen.routeName,
-                  arguments: ActivationType.mobileNumber,
-                );
+              _changePassword = !_changePassword;
+              if (_changePassword) {
+                Navigator.of(context)
+                    .push(
+                      MaterialPageRoute(
+                        builder: (ctx) => ActivationScreen(
+                          activationType: ActivationType.forgotPassword,
+                        ),
+                      ),
+                    )
+                    .then(
+                      (value) => _changePassword = false,
+                    );
               }
             });
             break;

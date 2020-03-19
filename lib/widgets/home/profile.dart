@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:safqty/screens/tabs/profile_screen.dart';
 
 class Profile extends StatelessWidget {
+  final String name;
+
+  Profile(this.name);
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -26,7 +30,7 @@ class Profile extends StatelessWidget {
             width: 16,
           ),
           Text(
-            'أسامة محمد العيتيبي',
+            name,
             style: TextStyle(
               fontSize: 20,
               color: Colors.white,

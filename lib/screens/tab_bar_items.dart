@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:safqty/constents/colors.dart';
+import 'package:safqty/constents/helper.dart';
 import 'package:safqty/providers/login_provider.dart';
 import 'package:safqty/widgets/common/commons.dart';
 import 'package:safqty/widgets/tabs/add_auction.dart';
@@ -32,7 +33,6 @@ class _TabBarItemsState extends State<TabBarItems> {
 
   @override
   Widget build(BuildContext context) {
-    print(Provider.of<LoginProvider>(context,listen: false).token);
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     return WillPopScope(
       onWillPop: () => Commons.closeTheApp(context),
