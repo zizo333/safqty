@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:safqty/constents/colors.dart';
 
 class MainDetails extends StatelessWidget {
+  final auctionData;
+
+  MainDetails(this.auctionData);
+
   final textStyle = TextStyle(fontSize: 13, color: Color(0XFFAAB5BC));
 
   @override
@@ -14,7 +18,7 @@ class MainDetails extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(
-              'مكتب و كرسي أيكا جديد',
+              auctionData.title,
               style: TextStyle(
                 fontSize: 19,
                 fontWeight: FontWeight.bold,
@@ -52,14 +56,14 @@ class MainDetails extends StatelessWidget {
               width: 30,
             ),
             Text(
-              'الجمعة 24 أ أغسطس',
+              auctionData.startDate,
               style: textStyle,
             ),
             SizedBox(
               width: 40,
             ),
             Text(
-              'الاثنين 29 أ أغسطس',
+              auctionData.endDate,
               style: textStyle,
             ),
           ],
@@ -77,7 +81,7 @@ class MainDetails extends StatelessWidget {
               width: 13,
             ),
             Text(
-              'السعودية , الدمام , شارع',
+              auctionData.address,
               style: textStyle,
             ),
           ],
@@ -86,7 +90,7 @@ class MainDetails extends StatelessWidget {
           height: 10,
         ),
         Text(
-          'هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة ، لقد تم توليد هذا النص من مولد النص العربى، حيث يمكنك أن تولد مثل هذا النص',
+          auctionData.description,
           style: TextStyle(
             fontSize: 13,
             color: SBlack1,
@@ -105,14 +109,26 @@ class MainDetails extends StatelessWidget {
         Row(
           children: <Widget>[
             _buildAuctionDetails(
-                imagePath: 'assets/images/tag.png', price: '400 ريال', status: 'بداية السوم'),
-            SizedBox(width: 15,),
+                imagePath: 'assets/images/tag.png',
+                price: auctionData.startPrice + ' ' + tr('currency'),
+                status: tr('start_price')),
+            SizedBox(
+              width: 15,
+            ),
             _buildAuctionDetails(
-                imagePath: 'assets/images/tag.png', price: '900 ريال', status: 'الحد'),
-            SizedBox(width: 15,),
+                imagePath: 'assets/images/tag.png',
+                price: auctionData.lastPrice + ' ' + tr('currency'),
+                status: tr('end_price')),
+            SizedBox(
+              width: 15,
+            ),
             _buildAuctionDetails(
-                imagePath: 'assets/images/quantity.png', price: '12 عدد', status: 'الكمية'),
-            SizedBox(width: 15,),
+                imagePath: 'assets/images/quantity.png',
+                price: tr('count') + ' ${auctionData.count}',
+                status: tr('count')),
+            SizedBox(
+              width: 15,
+            ),
           ],
         )
       ],
@@ -162,35 +178,3 @@ class MainDetails extends StatelessWidget {
     );
   }
 }
-
-/*
-Expanded(
-      child: ListTile(
-        leading: Container(
-          height: 46,
-          width: 46,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: SOrange.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Image.asset(
-            'assets/images/bell_orange.png',
-            width: 25,
-            height: 25,
-          ),
-        ),
-        title: Container(
-          padding: const EdgeInsets.only(bottom: 9.0),
-          child: Text(
-            price,
-            style: TextStyle(color: SOrange),
-          ),
-        ),
-        subtitle: Text(
-          status,
-          style: textStyle,
-        ),
-      ),
-    );
- */

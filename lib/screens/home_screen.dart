@@ -1,6 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:loading_indicator/loading_indicator.dart';
+import 'package:provider/provider.dart';
+import 'package:safqty/constents/colors.dart';
 import 'package:safqty/constents/helper.dart';
+import 'package:safqty/models/home.dart';
+import 'package:safqty/providers/home_provider.dart';
 import 'package:safqty/screens/auction_details_screen.dart';
 import 'package:safqty/screens/filter_screen.dart';
 import 'package:safqty/widgets/home/auction_footer.dart';
@@ -20,7 +26,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // TODO: Variables
   var _isCollapsed = false;
+  var _loading = false;
+  var _isInternetAvailable = true;
   Map<String, String> _userData = {};
+  List<OpenAuctionData> openAuctionData = [];
+  List<LimitAuctionData> limitAuctionData = [];
+  List<RequestAuctionData> requestAuctionData = [];
 
   @override
   void initState() {
@@ -31,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _userData = value;
       });
     });
+    _fetchHomeData();
   }
 
   @override
@@ -68,7 +80,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ListView(
                 padding: const EdgeInsets.only(top: 75, bottom: 20),
                 children: <Widget>[
-                  Profile(_userData['name'] ?? tr('name'), _userData['image'] ?? ''),
+                  Profile(_userData['name'] ?? tr('name'),
+                      _userData['image'] ?? ''),
                   SizedBox(
                     height: isLandscape ? 5 : 20,
                   ),
@@ -128,7 +141,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       : ScrollPhysics(),
                   child: Container(
                     width: deviceSize.width,
-                    height: deviceSize.height + (isLandscape ? 760 : 260),
+                    height: _isInternetAvailable
+                        ? deviceSize.height + (isLandscape ? 760 : 260)
+                        : deviceSize.height,
                     child: Stack(
                       children: <Widget>[
                         AnimatedPositioned(
@@ -174,97 +189,213 @@ class _HomeScreenState extends State<HomeScreen> {
                           left: _isCollapsed ? 20 : 0,
                           right: _isCollapsed ? 20 : 0,
                           bottom: 100,
-                          child: ListView(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            children: <Widget>[
-                              Align(
-                                alignment: Alignment.center,
-                                child: Text(
-                                  tr('what_do_you_need'),
-                                  style: TextStyle(
-                                    color: Color(0XFF434A51),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                          child: _isInternetAvailable
+                              ? ListView(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  children: <Widget>[
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        tr('what_do_you_need'),
+                                        style: TextStyle(
+                                          color: Color(0XFF434A51),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
+                                    AuctionFooter(
+                                      imageSource:
+                                          'assets/images/auctionopen.png',
+                                      title: tr('open_auction'),
+                                      actionImage: 'assets/images/view.png',
+                                      action: () {
+                                        Navigator.of(context).pushNamed(
+                                          FilterScreen.routeName,
+                                          arguments: [
+                                            tr('open_auction'),
+                                            AuctionType.OpenAuction
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
+                                    _loading
+                                        ? Container(
+                                            height: 180,
+                                            alignment: Alignment.center,
+                                            child: SizedBox(
+                                              height: 60,
+                                              width: 60,
+                                              child: LoadingIndicator(
+                                                color: SOrange,
+                                                indicatorType:
+                                                    Indicator.ballClipRotate,
+                                              ),
+                                            ),
+                                          )
+                                        : openAuctionData.isEmpty
+                                            ? Container(
+                                                height: 80,
+                                                alignment: Alignment.center,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 20,
+                                                ),
+                                                child: Text(
+                                                  tr('auctions_not_available'),
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 25,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              )
+                                            : AuctionHorizontalList(
+                                                isCollapsed: _isCollapsed,
+                                                withTime: false,
+                                                auctionData: openAuctionData,
+                                              ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    AuctionFooter(
+                                      imageSource:
+                                          'assets/images/auctionclosed.png',
+                                      title: tr('time_specific_auctions'),
+                                      actionImage: 'assets/images/view.png',
+                                      action: () {
+                                        Navigator.of(context).pushNamed(
+                                          FilterScreen.routeName,
+                                          arguments: [
+                                            tr('time_auctions'),
+                                            AuctionType.TimeAuctions
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
+                                    _loading
+                                        ? Container(
+                                            height: 180,
+                                            alignment: Alignment.center,
+                                            child: SizedBox(
+                                              height: 60,
+                                              width: 60,
+                                              child: LoadingIndicator(
+                                                color: SOrange,
+                                                indicatorType:
+                                                    Indicator.ballClipRotate,
+                                              ),
+                                            ),
+                                          )
+                                        : limitAuctionData.isEmpty
+                                            ? Container(
+                                                height: 80,
+                                                alignment: Alignment.center,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 20,
+                                                ),
+                                                child: Text(
+                                                  tr('auctions_not_available'),
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 25,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              )
+                                            : AuctionHorizontalList(
+                                                isCollapsed: _isCollapsed,
+                                                withTime: true,
+                                                auctionType:
+                                                    AuctionType.TimeAuctions,
+                                                auctionData: limitAuctionData,
+                                              ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    AuctionFooter(
+                                      imageSource:
+                                          'assets/images/order_ads.png',
+                                      title: tr('required_ads'),
+                                      actionImage: 'assets/images/view.png',
+                                      action: () {
+                                        Navigator.of(context).pushNamed(
+                                          FilterScreen.routeName,
+                                          arguments: [
+                                            tr('orders'),
+                                            AuctionType.OpenAuction
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
+                                    _loading
+                                        ? Container(
+                                            height: 155,
+                                            alignment: Alignment.center,
+                                            child: SizedBox(
+                                              height: 60,
+                                              width: 60,
+                                              child: LoadingIndicator(
+                                                color: SOrange,
+                                                indicatorType:
+                                                    Indicator.ballClipRotate,
+                                              ),
+                                            ),
+                                          )
+                                        : requestAuctionData.isEmpty
+                                            ? Container(
+                                                height: 80,
+                                                alignment: Alignment.center,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 20,
+                                                ),
+                                                child: Text(
+                                                  tr('auctions_not_available'),
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 25,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              )
+                                            : AuctionHorizontalList(
+                                                isCollapsed: _isCollapsed,
+                                                withTime: false,
+                                                isAds: true,
+                                                auctionData: openAuctionData,
+                                              ),
+                                  ],
+                                )
+                              : Container(
+                                  height: 80,
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                  ),
+                                  child: Text(
+                                    tr('check_internet'),
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              AuctionFooter(
-                                imageSource: 'assets/images/auctionopen.png',
-                                title: tr('open_auction'),
-                                actionImage: 'assets/images/view.png',
-                                action: () {
-                                  Navigator.of(context).pushNamed(
-                                    FilterScreen.routeName,
-                                    arguments: [
-                                      tr('open_auction'),
-                                      AuctionType.OpenAuction
-                                    ],
-                                  );
-                                },
-                              ),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              AuctionHorizontalList(
-                                isCollapsed: _isCollapsed,
-                                withTime: false,
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              AuctionFooter(
-                                imageSource: 'assets/images/auctionclosed.png',
-                                title: tr('time_specific_auctions'),
-                                actionImage: 'assets/images/view.png',
-                                action: () {
-                                  Navigator.of(context).pushNamed(
-                                    FilterScreen.routeName,
-                                    arguments: [
-                                      tr('time_auctions'),
-                                      AuctionType.TimeAuctions
-                                    ],
-                                  );
-                                },
-                              ),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              AuctionHorizontalList(
-                                isCollapsed: _isCollapsed,
-                                withTime: true,
-                                auctionType: AuctionType.TimeAuctions,
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              AuctionFooter(
-                                imageSource: 'assets/images/order_ads.png',
-                                title: tr('required_ads'),
-                                actionImage: 'assets/images/view.png',
-                                action: () {
-                                  Navigator.of(context).pushNamed(
-                                    FilterScreen.routeName,
-                                    arguments: [
-                                      tr('orders'),
-                                      AuctionType.OpenAuction
-                                    ],
-                                  );
-                                },
-                              ),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              AuctionHorizontalList(
-                                isCollapsed: _isCollapsed,
-                                withTime: false,
-                                isAds: true,
-                              ),
-                            ],
-                          ),
                         )
                       ],
                     ),
@@ -283,5 +414,38 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _isCollapsed = !_isCollapsed;
     });
+  }
+
+  Future<void> _fetchHomeData() async {
+    setState(() {
+      _loading = true;
+    });
+    try {
+      final homeData = await Provider.of<HomeProvider>(context, listen: false)
+          .fetchHomeData();
+      openAuctionData = homeData.data.open;
+//      limitAuctionData = homeData.data.limit;
+//      requestAuctionData = homeData.data.request;
+    } catch (error) {
+      setState(() {
+        _isInternetAvailable = false;
+      });
+      showToast(
+        tr('check_internet'),
+        context: context,
+        textStyle: TextStyle(fontSize: 20.0, color: Colors.white),
+        backgroundColor: SOrange,
+        textPadding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 30.0),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.elliptical(10.0, 20.0),
+          bottom: Radius.elliptical(10.0, 20.0),
+        ),
+        textAlign: TextAlign.justify,
+      );
+    } finally {
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 }

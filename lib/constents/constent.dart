@@ -10,3 +10,4 @@ const FORGET_PASSWORD_URL = BASE_URL + 'forget_password';
 const CHANGE_PASSWORD_URL = BASE_URL + 'change_password';
 const SLIDER_URL = BASE_URL + 'banners';
 const UPDATE_PROFILE_URL = BASE_URL + 'update_profile';
+const HOME_DATA_URL = BASE_URL + 'home_auction';

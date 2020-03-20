@@ -130,5 +130,10 @@
   "enter_your_mobile_number_to_change_the_mobile_number" : "أدخل رقم جوالك لتغيير رقم الجوال",
   "enter_your_mobile_number_to_change_the_password" : "أدخل رقم جوالك لتغيير كلمة المرور",
   "update" : "تعديل",
-  "updated_data" : "تم تعديل البيانات الشخصية"
+  "updated_data" : "تم تعديل البيانات الشخصية",
+  "auctions_not_available" : "لا يوجد أى مزادات الان",
+  "currency" : "ريال",
+  "count" : "عدد",
+  "start_price" : "بداية السوم",
+  "end_price" : "الحد"
 }

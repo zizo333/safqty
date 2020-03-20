@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:safqty/constents/colors.dart';
+import 'package:safqty/providers/home_provider.dart';
 import 'package:safqty/widgets/auction_details/auction_details_slider.dart';
 import 'package:safqty/widgets/auction_details/auction_item_details.dart';
 import 'package:safqty/widgets/auction_details/main_details.dart';
@@ -16,13 +18,17 @@ class AuctionDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auctionType = ModalRoute.of(context).settings.arguments as AuctionType;
+    final args = ModalRoute.of(context).settings.arguments as List;
+    final auctionType = args[0] as AuctionType;
+    final auctionData = args[1];
     final deviceSize = MediaQuery.of(context).size;
+    final images = Provider.of<HomeProvider>(context, listen: false)
+        .getImageList(auctionData.images);
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            AuctionDetailsSlider(auctionType),
+            AuctionDetailsSlider(auctionType, images),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -49,7 +55,7 @@ class AuctionDetailsScreen extends StatelessWidget {
                               vertical: 26,
                               horizontal: 20,
                             ),
-                            child: MainDetails(),
+                            child: MainDetails(auctionData),
                           ),
                         ),
                       )

@@ -130,5 +130,10 @@
   "enter_your_mobile_number_to_change_the_mobile_number" : "Enter your mobile number to change the mobile number",
   "enter_your_mobile_number_to_change_the_password" : "Enter your mobile number to change the password",
   "update" : "Update",
-  "updated_data" : "Updated successfully"
+  "updated_data" : "Updated successfully",
+  "auctions_not_available" : "There is no any auctions now",
+  "currency" : "SAR",
+  "count" : "Count",
+  "start_price" : "Start price",
+  "end_price" : "End price"
 }

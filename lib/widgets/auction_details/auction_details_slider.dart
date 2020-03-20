@@ -6,22 +6,15 @@ import 'package:safqty/screens/auction_details_screen.dart';
 
 class AuctionDetailsSlider extends StatefulWidget {
   final AuctionType auctionType;
+  final Map<int, String> images;
 
-  AuctionDetailsSlider(this.auctionType);
+  AuctionDetailsSlider(this.auctionType, this.images);
 
   @override
   _AuctionDetailsSliderState createState() => _AuctionDetailsSliderState();
 }
 
 class _AuctionDetailsSliderState extends State<AuctionDetailsSlider> {
-  // TODO: Variables
-  final Map<int, String> _imageList = {
-    0: 'assets/images/auction_item.png',
-    1: 'assets/images/auction_item.png',
-    2: 'assets/images/auction_item.png',
-    3: 'assets/images/auction_item.png',
-  };
-
   var _currentIndex = 0;
 
   @override
@@ -47,13 +40,13 @@ class _AuctionDetailsSliderState extends State<AuctionDetailsSlider> {
                   _currentIndex = index;
                 });
               },
-              items: _imageList.entries.map((image) {
+              items: widget.images.entries.map((image) {
                 return Builder(
                   builder: (BuildContext context) {
                     return Container(
                       width: double.infinity,
                       child: ClipRRect(
-                        child: Image.asset(
+                        child: Image.network(
                           image.value,
                           fit: BoxFit.cover,
                         ),
@@ -72,7 +65,7 @@ class _AuctionDetailsSliderState extends State<AuctionDetailsSlider> {
             child: Container(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: _imageList.entries.map((image) {
+                children: widget.images.entries.map((image) {
                   return Container(
                     width: _currentIndex == image.key ? 30 : 10,
                     height: 10,
