@@ -23,7 +23,6 @@ class Register {
       'device_token': '11111',
       'device_type': Platform.isAndroid ? 'android' : 'ios',
       'city_id': cityId,
-      'image': image,
     };
   }
 }

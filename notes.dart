@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
@@ -9,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:safqty/screens/auth/intro_screen.dart';
 import 'package:safqty/screens/auth/login_screen.dart';
+import 'package:http/http.dart' as http;
 
 /*
 === language ====
@@ -321,7 +324,8 @@ class _NotesState extends State<Notes> with SingleTickerProviderStateMixin {
   }
 
   /// timer
-  void startTimer() {  // in dispose -> _timer.cancel()
+  void startTimer() {
+    // in dispose -> _timer.cancel()
     const oneSec = const Duration(seconds: 1);
     _timer = Timer.periodic(oneSec, (timer) {
       setState(() {
@@ -371,5 +375,40 @@ class MyNotification {
       platform,
       payload: code,
     );
+  }
+
+  /// Multipart
+  Future<Map<String, dynamic>> updateProfile(
+    Map<String, String> parameters,
+    String imagePath,
+  ) async {
+    Map<String, dynamic> result = {
+      'value': false,
+      'msg': '',
+    };
+    try {
+      final deviceToken = '';
+      final token = '';
+      parameters['device_type'] = Platform.isAndroid ? 'android' : 'ios';
+      parameters['device_token'] = deviceToken;
+      final request = http.MultipartRequest('POST', Uri.parse('url'));
+      if (imagePath.isNotEmpty) {
+        request.files
+            .add(await http.MultipartFile.fromPath('image', imagePath));
+      }
+      request.fields.addAll(parameters);
+      request.headers[HttpHeaders.authorizationHeader] = 'Bearer $token';
+      final response = await request.send();
+      final extractedData = await http.Response.fromStream(response);
+      final responseData = json.decode(extractedData.body);
+      result['value'] = responseData['value'];
+      if (result['value']) {
+      } else {
+        result['msg'] = responseData['msg'];
+      }
+      return result;
+    } catch (error) {
+      throw error;
+    }
   }
 }

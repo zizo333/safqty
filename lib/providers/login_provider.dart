@@ -117,7 +117,7 @@ class LoginProvider with ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> updateProfile(Map<String, String> parameters) async {
+  Future<Map<String, dynamic>> updateProfile(Map<String, String> parameters, String imagePath) async {
     Map<String, dynamic> result = {
       'value': false,
       'msg': '',
@@ -127,22 +127,25 @@ class LoginProvider with ChangeNotifier {
       final token = await getUserToken();
       parameters['device_type'] = Platform.isAndroid ? 'android' : 'ios';
       parameters['device_token'] = deviceToken;
-      final response = await http.post(
-        UPDATE_PROFILE_URL,
-        body: parameters,
-        headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
-      );
-      final responseData = json.decode(response.body);
+      final request = http.MultipartRequest('POST', Uri.parse(UPDATE_PROFILE_URL));
+      if (imagePath.isNotEmpty) {
+        request.files.add(await http.MultipartFile.fromPath('image', imagePath));
+      }
+      request.fields.addAll(parameters);
+      request.headers[HttpHeaders.authorizationHeader] = 'Bearer $token';
+      final response = await request.send();
+      final extractedData = await http.Response.fromStream(response);
+      final responseData = json.decode(extractedData.body);
       result['value'] = responseData['value'];
-      if(!result['value']) {
-        result['msg'] = responseData['msg'];
-      } else {
+      if(result['value']) {
         await saveUserData(
-          responseData['name'],
-          responseData['email'],
-          responseData['mobile'],
-          responseData['image'],
+          responseData['data']['name'],
+          responseData['data']['email'],
+          responseData['data']['mobile'],
+          responseData['data']['image'],
         );
+      } else {
+        result['msg'] = responseData['msg'];
       }
       return result;
     } catch (error) {

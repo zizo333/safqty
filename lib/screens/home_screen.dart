@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ListView(
                 padding: const EdgeInsets.only(top: 75, bottom: 20),
                 children: <Widget>[
-                  Profile(_userData['name'] ?? tr('name')),
+                  Profile(_userData['name'] ?? tr('name'), _userData['image'] ?? ''),
                   SizedBox(
                     height: isLandscape ? 5 : 20,
                   ),

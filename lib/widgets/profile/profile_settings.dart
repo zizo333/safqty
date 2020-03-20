@@ -12,8 +12,16 @@ import 'package:safqty/widgets/login_register/login_register_style.dart';
 
 class ProfileSettings extends StatefulWidget {
   final Map<String, String> userData;
+  final String selectedImage;
+  final Function updateUserData;
+  final Function toggleUpdate;
 
-  ProfileSettings(this.userData);
+  ProfileSettings({
+    this.userData,
+    this.selectedImage,
+    this.updateUserData,
+    this.toggleUpdate,
+  });
 
   @override
   _ProfileSettingsState createState() => _ProfileSettingsState();
@@ -32,7 +40,6 @@ class _ProfileSettingsState extends State<ProfileSettings> {
     'email': '',
     'device_token': '',
     'device_type': '',
-    'image': '',
   };
   FocusNode _phoneNumberNode = FocusNode();
   FocusNode _emailNode = FocusNode();
@@ -193,6 +200,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           if (!_update) {
                             setState(() {
                               _update = true;
+                              widget.toggleUpdate();
                             });
                           } else {
                             _submit();
@@ -217,10 +225,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
     });
     try {
       final result = await Provider.of<LoginProvider>(context, listen: false)
-          .updateProfile(_changedData);
-      setState(() {
-        _update = false;
-      });
+          .updateProfile(_changedData, widget.selectedImage);
       if (!result['value']) {
         Commons.showAlert(
           context: context,
@@ -228,6 +233,11 @@ class _ProfileSettingsState extends State<ProfileSettings> {
           content: result['msg'],
         );
       } else {
+        setState(() {
+          _update = false;
+        });
+        widget.toggleUpdate();
+        widget.updateUserData();
         showToast(
           tr('updated_data'),
           context: context,

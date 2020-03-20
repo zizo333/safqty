@@ -17,6 +17,40 @@ class RegisterProvider with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> register(
+      Map<String, String> parameters, String imagePath) async {
+    Map<String, dynamic> result = {'value': '', 'msg': '', 'mobile': ''};
+    try {
+      var request = http.MultipartRequest('POST', Uri.parse(REGISTER_URL));
+      if (imagePath.isNotEmpty) {
+        request.files
+            .add(await http.MultipartFile.fromPath('image', imagePath));
+      }
+      request.fields.addAll(parameters);
+      final response = await request.send();
+      final extractedData = await http.Response.fromStream(response);
+      final responseData = json.decode(extractedData.body);
+      result['value'] = responseData['value'];
+      if (result['value']) {
+        result['msg'] = '${responseData['data']['code']}';
+        result['mobile'] = parameters['mobile'];
+        _token = responseData['data']['token'].toString();
+        await saveUserData(
+          responseData['data']['name'],
+          responseData['data']['email'],
+          responseData['data']['mobile'],
+          responseData['data']['image'],
+        );
+      } else {
+        result['msg'] = responseData['msg'];
+      }
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /*
+  Future<Map<String, dynamic>> register(
     Map<String, String> parameters,
     File userImage,
   ) async {
@@ -50,6 +84,7 @@ class RegisterProvider with ChangeNotifier {
       throw error;
     }
   }
+   */
 
   Future<Map<String, dynamic>> verifyAccount(
       {String code, String mobile}) async {

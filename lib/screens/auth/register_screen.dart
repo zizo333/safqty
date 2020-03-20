@@ -25,7 +25,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   // TODO: Variables
   GlobalKey<FormState> _form = GlobalKey();
-  File _selectedImage;
+  String _selectedImage = '';
   final _registerData = Register();
   var _acceptConditions = false;
   var _loading = false;
@@ -140,7 +140,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // TODO: Helper functions
   void _getPickedImage(File pickedImage) {
-    _selectedImage = pickedImage;
+    _selectedImage = pickedImage.path ?? '';
   }
 
   Future<void> _register() async {
@@ -165,12 +165,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() {
       _loading = true;
     });
+    print(_selectedImage);
     try {
-      final result =
-          await Provider.of<RegisterProvider>(context, listen: false).register(
-        _registerData.getRegisterData(),
-        _selectedImage,
-      );
+      final result = await Provider.of<RegisterProvider>(context, listen: false)
+          .register(_registerData.getRegisterData(), _selectedImage);
       if (result['value']) {
         Navigator.of(context).push(
           MaterialPageRoute(
